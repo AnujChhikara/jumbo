@@ -17,9 +17,15 @@ interface UserTableProps {
   users: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onAddUser: () => void;
 }
 
-export const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
+export const UserTable = ({
+  users,
+  onEdit,
+  onDelete,
+  onAddUser,
+}: UserTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [emailSortOrder, setEmailSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -136,6 +142,13 @@ export const UserTable = ({ users, onEdit, onDelete }: UserTableProps) => {
             </Select.Content>
           </Select.Portal>
         </Select.Root>
+
+        <button
+          onClick={onAddUser}
+          className='flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors'
+        >
+          Add User
+        </button>
       </div>
 
       <div className='border border-border rounded-lg overflow-hidden'>
