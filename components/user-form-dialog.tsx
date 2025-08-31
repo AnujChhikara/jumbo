@@ -2,13 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Cross2Icon } from '@radix-ui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Loader2, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { UsersApi } from '../api/users/users.api';
 import { User } from '../api/users/users.types';
+import { useToast } from './toast-provider';
 
 interface UserFormDialogProps {
   user?: User | null;
@@ -31,6 +32,7 @@ export const UserFormDialog = ({
   onOpenChange,
 }: UserFormDialogProps) => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const isEditing = !!user;
 
   const {
@@ -135,6 +137,7 @@ export const UserFormDialog = ({
       if (context?.previousUsers) {
         queryClient.setQueryData(['users'], context.previousUsers);
       }
+      showToast('error', 'Failed to save user', 'Please try again.');
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -142,6 +145,10 @@ export const UserFormDialog = ({
     onSuccess: () => {
       onOpenChange(false);
       reset();
+      showToast(
+        'success',
+        isEditing ? 'User updated successfully' : 'User created successfully'
+      );
     },
   });
 
@@ -160,7 +167,7 @@ export const UserFormDialog = ({
             </Dialog.Title>
             <Dialog.Close asChild>
               <button className='p-1 hover:bg-accent rounded transition-colors'>
-                <Cross2Icon className='w-4 h-4' />
+                <X className='w-4 h-4' />
               </button>
             </Dialog.Close>
           </div>
@@ -286,10 +293,10 @@ export const UserFormDialog = ({
               <button
                 type='submit'
                 disabled={isPending}
-                className='flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+                className='flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[40px] min-w-[120px]'
               >
                 {isPending ? (
-                  'Saving...'
+                  <Loader2 className='w-4 h-4 animate-spin text-primary-foreground' />
                 ) : (
                   <>{isEditing ? 'Update User' : 'Add User'}</>
                 )}

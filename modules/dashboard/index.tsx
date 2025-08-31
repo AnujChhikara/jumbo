@@ -2,6 +2,7 @@
 
 import { UsersApi } from '@/api/users/users.api';
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
+import { useToast } from '@/components/toast-provider';
 import { UserFormDialog } from '@/components/user-form-dialog';
 import { UserTable } from '@/components/user-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -10,6 +11,7 @@ import { User } from '../../api/users/users.types';
 
 export const UserDashboard = () => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -52,6 +54,7 @@ export const UserDashboard = () => {
     onSuccess: () => {
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
+      showToast('success', 'User deleted successfully');
     },
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import * as Dialog from '@radix-ui/react-dialog';
-import { Cross2Icon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { User } from '../api/users/users.types';
 
 interface DeleteConfirmationDialogProps {
@@ -28,7 +28,7 @@ export const DeleteConfirmationDialog = ({
         <Dialog.Content className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-border rounded-lg shadow-lg p-6 w-full max-w-md z-50'>
           <div className='flex items-center gap-3 mb-4'>
             <div className='flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10'>
-              <ExclamationTriangleIcon className='w-5 h-5 text-destructive' />
+              <AlertTriangle className='w-5 h-5 text-destructive' />
             </div>
             <div>
               <Dialog.Title className='text-lg font-semibold text-foreground'>
@@ -40,7 +40,7 @@ export const DeleteConfirmationDialog = ({
             </div>
             <Dialog.Close asChild>
               <button className='ml-auto p-1 hover:bg-accent rounded transition-colors'>
-                <Cross2Icon className='w-4 h-4' />
+                <X className='w-4 h-4' />
               </button>
             </Dialog.Close>
           </div>
@@ -65,9 +65,13 @@ export const DeleteConfirmationDialog = ({
             <button
               onClick={onConfirm}
               disabled={isDeleting}
-              className='px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+              className='px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[40px] min-w-[120px] flex items-center justify-center'
             >
-              {isDeleting ? 'Deleting...' : 'Delete User'}
+              {isDeleting ? (
+                <Loader2 className='w-4 h-4 animate-spin text-destructive-foreground' />
+              ) : (
+                'Delete User'
+              )}
             </button>
           </div>
         </Dialog.Content>

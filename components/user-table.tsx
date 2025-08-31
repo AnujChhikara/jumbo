@@ -1,15 +1,16 @@
 'use client';
 
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  MagnifyingGlassIcon,
-  Pencil1Icon,
-  TrashIcon,
-} from '@radix-ui/react-icons';
 import * as Select from '@radix-ui/react-select';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { User } from '../api/users/users.types';
 
@@ -95,7 +96,7 @@ export const UserTable = ({
     <div className='min-w-7xl space-y-4'>
       <div className='flex flex-col sm:flex-row gap-4'>
         <div className='relative flex-1'>
-          <MagnifyingGlassIcon className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4' />
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4' />
           <input
             type='text'
             placeholder='Search by name...'
@@ -112,7 +113,7 @@ export const UserTable = ({
           <Select.Trigger className='flex items-center text-sm justify-between w-full sm:w-48 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent cursor-pointer hover:bg-accent'>
             <Select.Value placeholder='Filter by company' />
             <Select.Icon>
-              <ChevronDownIcon className='w-4 h-4 text-muted-foreground' />
+              <ChevronDown className='w-4 h-4 text-muted-foreground' />
             </Select.Icon>
           </Select.Trigger>
           <Select.Portal>
@@ -145,8 +146,9 @@ export const UserTable = ({
 
         <button
           onClick={onAddUser}
-          className='flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors'
+          className='flex items-center text-sm gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors min-h-[40px] min-w-[120px]'
         >
+          <Plus className='w-4 h-4' />
           Add User
         </button>
       </div>
@@ -169,9 +171,9 @@ export const UserTable = ({
                   >
                     Email
                     {emailSortOrder === 'asc' ? (
-                      <ChevronUpIcon className='w-4 h-4' />
+                      <ChevronUp className='w-4 h-4' />
                     ) : (
-                      <ChevronDownIcon className='w-4 h-4' />
+                      <ChevronDown className='w-4 h-4' />
                     )}
                   </button>
                 </th>
@@ -216,14 +218,14 @@ export const UserTable = ({
                         className='p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
                         title='Edit user'
                       >
-                        <Pencil1Icon className='w-4 h-4' />
+                        <Pencil className='w-4 h-4' />
                       </button>
                       <button
                         onClick={() => onDelete(user)}
                         className='p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
                         title='Delete user'
                       >
-                        <TrashIcon className='w-4 h-4' />
+                        <Trash2 className='w-4 h-4' />
                       </button>
                     </div>
                   </td>
@@ -253,7 +255,7 @@ export const UserTable = ({
               disabled={currentPage === 1}
               className='flex items-center gap-1 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
             >
-              <ChevronLeftIcon className='w-4 h-4' />
+              <ChevronLeft className='w-4 h-4' />
               Previous
             </button>
             <button
@@ -262,7 +264,7 @@ export const UserTable = ({
               className='flex items-center gap-1 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
             >
               Next
-              <ChevronRightIcon className='w-4 h-4' />
+              <ChevronRight className='w-4 h-4' />
             </button>
           </div>
         </div>
