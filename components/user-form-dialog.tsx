@@ -127,7 +127,7 @@ export const UserFormDialog = ({
         if (isEditing) {
           return old.map(u => (u.id === newUser.id ? newUser : u));
         } else {
-          return [...old, newUser];
+          return [newUser, ...old];
         }
       });
 
@@ -137,10 +137,7 @@ export const UserFormDialog = ({
       if (context?.previousUsers) {
         queryClient.setQueryData(['users'], context.previousUsers);
       }
-      showToast('error', 'Failed to save user', 'Please try again.');
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      showToast('error', 'Failed to save user');
     },
     onSuccess: () => {
       onOpenChange(false);
