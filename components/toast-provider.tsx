@@ -10,11 +10,10 @@ interface ToastData {
   id: string;
   type: ToastType;
   title: string;
-  description?: string;
 }
 
 interface ToastContextType {
-  showToast: (type: ToastType, title: string, description?: string) => void;
+  showToast: (type: ToastType, title: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -30,9 +29,9 @@ export const useToast = () => {
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const showToast = (type: ToastType, title: string, description?: string) => {
+  const showToast = (type: ToastType, title: string) => {
     const id = Math.random().toString(36).substr(2, 9);
-    const newToast: ToastData = { id, type, title, description };
+    const newToast: ToastData = { id, type, title };
 
     setToasts(prev => [...prev, newToast]);
     setTimeout(() => {
@@ -86,18 +85,13 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
           >
             <div className='flex-shrink-0'>{getToastIcon(toast.type)}</div>
             <div className='flex-1'>
-              <Toast.Title className='text-sm font-medium text-foreground'>
+              <Toast.Title className='text-sm font-medium text-white'>
                 {toast.title}
               </Toast.Title>
-              {toast.description && (
-                <Toast.Description className='text-sm text-muted-foreground mt-1'>
-                  {toast.description}
-                </Toast.Description>
-              )}
             </div>
             <Toast.Close asChild>
               <button className='flex-shrink-0 p-1 hover:bg-accent rounded transition-colors'>
-                <X className='w-4 h-4' />
+                <X className='w-4 h-4 text-white' />
               </button>
             </Toast.Close>
           </Toast.Root>

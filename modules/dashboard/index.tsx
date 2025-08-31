@@ -22,7 +22,7 @@ export const UserDashboard = () => {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const userSearchTerm = searchParams.get('username') || '';
+  const searchTerm = searchParams.get('search') || '';
   const selectedCompany = searchParams.get('company') || 'all';
   const usersPerPage = 8;
 
@@ -40,15 +40,31 @@ export const UserDashboard = () => {
   const allUsers = users;
 
   const handlePageChange = (page: number) => {
-    router.push(`?page=${page}`);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', page.toString());
+    router.push(`?${params.toString()}`);
   };
 
-  const handleUserSearchChange = (term: string) => {
-    router.push(`?username=${term}&page=1`);
+  const handleSearchChange = (search: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (search) {
+      params.set('search', search);
+    } else {
+      params.delete('search');
+    }
+    params.set('page', '1');
+    router.push(`?${params.toString()}`);
   };
 
   const handleCompanyChange = (company: string) => {
-    router.push(`?company=${company}&page=1`);
+    const params = new URLSearchParams(searchParams);
+    if (company && company !== 'all') {
+      params.set('company', company);
+    } else {
+      params.delete('company');
+    }
+    params.set('page', '1');
+    router.push(`?${params.toString()}`);
   };
 
   const handleEditUser = (user: User) => {
@@ -107,7 +123,6 @@ export const UserDashboard = () => {
       <div className='min-w-7xl space-y-4'>
         <h1 className='text-2xl font-bold'>User Dashboard</h1>
         <UserTable
-          users={users ?? []}
           allUsers={allUsers ?? []}
           onEdit={handleEditUser}
           onDelete={handleDeleteUser}
@@ -115,10 +130,10 @@ export const UserDashboard = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          onSearchChange={handleUserSearchChange}
-          onCompanyChange={handleCompanyChange}
-          searchTerm={userSearchTerm}
+          searchTerm={searchTerm}
           selectedCompany={selectedCompany}
+          onSearchChange={handleSearchChange}
+          onCompanyChange={handleCompanyChange}
         />
       </div>
 

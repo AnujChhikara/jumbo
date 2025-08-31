@@ -16,7 +16,6 @@ import { useMemo, useState } from 'react';
 import { User } from '../api/users/users.types';
 
 interface UserTableProps {
-  users: User[];
   allUsers: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
@@ -24,14 +23,13 @@ interface UserTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  onSearchChange: (term: string) => void;
-  onCompanyChange: (company: string) => void;
   searchTerm: string;
   selectedCompany: string;
+  onSearchChange: (search: string) => void;
+  onCompanyChange: (company: string) => void;
 }
 
 export const UserTable = ({
-  users,
   allUsers,
   onEdit,
   onDelete,
@@ -39,10 +37,10 @@ export const UserTable = ({
   currentPage,
   totalPages,
   onPageChange,
-  onSearchChange,
-  onCompanyChange,
   searchTerm,
   selectedCompany,
+  onSearchChange,
+  onCompanyChange,
 }: UserTableProps) => {
   const router = useRouter();
   const [emailSortOrder, setEmailSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -54,15 +52,27 @@ export const UserTable = ({
     return uniqueCompanies.sort((a, b) => a.localeCompare(b));
   }, [allUsers]);
 
-  const sortedUsers = useMemo(() => {
-    return [...users].sort((a, b) => {
+  const filteredAndSortedUsers = useMemo(() => {
+    let filtered = allUsers;
+
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedCompany !== 'all') {
+      filtered = filtered.filter(user => user.company.name === selectedCompany);
+    }
+
+    return filtered.sort((a, b) => {
       const emailA = a.email.toLowerCase();
       const emailB = b.email.toLowerCase();
       return emailSortOrder === 'asc'
         ? emailA.localeCompare(emailB)
         : emailB.localeCompare(emailA);
     });
-  }, [users, emailSortOrder]);
+  }, [allUsers, searchTerm, selectedCompany, emailSortOrder]);
 
   const getInitials = (name: string) => {
     return name
@@ -186,7 +196,7 @@ export const UserTable = ({
               </tr>
             </thead>
             <tbody className='divide-y divide-border'>
-              {sortedUsers.map((user: User) => (
+              {filteredAndSortedUsers.map((user: User) => (
                 <tr
                   key={user.id}
                   className='hover:bg-muted/30 transition-colors cursor-pointer'
@@ -239,7 +249,7 @@ export const UserTable = ({
           </table>
         </div>
 
-        {users.length === 0 && (
+        {filteredAndSortedUsers.length === 0 && (
           <div className='px-4 py-8 text-center text-muted-foreground'>
             {searchTerm || selectedCompany !== 'all'
               ? 'No users match your filters.'
