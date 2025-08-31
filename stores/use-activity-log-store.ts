@@ -1,21 +1,21 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export interface ActivityLogEntry {
+export type ActivityLogEntry = {
   id: string;
   action: 'created' | 'updated' | 'deleted';
   userId: number;
   userName: string;
   timestamp: Date | string;
   details: string;
-}
+};
 
-interface ActivityLogState {
+type ActivityLogState = {
   logs: ActivityLogEntry[];
   addLog: (entry: Omit<ActivityLogEntry, 'id' | 'timestamp'>) => void;
   clearLogs: () => void;
   getLogs: () => ActivityLogEntry[];
-}
+};
 
 export const useActivityLogStore = create<ActivityLogState>()(
   persist(

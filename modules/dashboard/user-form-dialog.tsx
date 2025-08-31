@@ -7,17 +7,17 @@ import { Loader2, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { UsersApi } from '../api/users/users.api';
-import { User } from '../api/users/users.types';
-import { ActivityLogEntry } from '../stores/use-activity-log-store';
-import { useToast } from './toast-provider';
+import { UsersApi } from '../../api/users/users.api';
+import { User } from '../../api/users/users.types';
+import { useToast } from '../../components/toast-provider';
+import { ActivityLogEntry } from '../../stores/use-activity-log-store';
 
-interface UserFormDialogProps {
+type UserFormDialogProps = {
   user?: User | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onUserAction?: (entry: Omit<ActivityLogEntry, 'id' | 'timestamp'>) => void;
-}
+};
 
 const userFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),

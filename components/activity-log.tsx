@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { Clock, Trash2, UserCheck, UserPlus, UserX, X } from 'lucide-react';
+import { formatTimestamp } from '../lib/utils';
 import {
   ActivityLogEntry,
   useActivityLogStore,
@@ -35,27 +36,6 @@ const getActionText = (action: ActivityLogEntry['action']) => {
       return 'Deleted';
     default:
       return action;
-  }
-};
-
-const formatTimestamp = (timestamp: Date | string) => {
-  const now = new Date();
-  const timestampDate =
-    typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
-  const diffInMinutes = Math.floor(
-    (now.getTime() - timestampDate.getTime()) / (1000 * 60)
-  );
-
-  if (diffInMinutes < 1) {
-    return 'Just now';
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes}m ago`;
-  } else if (diffInMinutes < 1440) {
-    const hours = Math.floor(diffInMinutes / 60);
-    return `${hours}h ago`;
-  } else {
-    const days = Math.floor(diffInMinutes / 1440);
-    return `${days}d ago`;
   }
 };
 

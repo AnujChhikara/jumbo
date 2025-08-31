@@ -6,17 +6,47 @@ import { createContext, useContext, useState } from 'react';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 
-interface ToastData {
+type ToastData = {
   id: string;
   type: ToastType;
   title: string;
-}
+};
 
-interface ToastContextType {
+type ToastContextType = {
   showToast: (type: ToastType, title: string) => void;
-}
+};
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+const getToastIcon = (type: ToastType) => {
+  switch (type) {
+    case 'success':
+      return <CheckCircle className='w-5 h-5 text-green-500' />;
+    case 'error':
+      return <AlertTriangle className='w-5 h-5 text-red-500' />;
+    case 'warning':
+      return <AlertTriangle className='w-5 h-5 text-yellow-500' />;
+    case 'info':
+      return <Info className='w-5 h-5 text-blue-500' />;
+    default:
+      return null;
+  }
+};
+
+const getToastStyles = (type: ToastType) => {
+  switch (type) {
+    case 'success':
+      return 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950';
+    case 'error':
+      return 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950';
+    case 'warning':
+      return 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950';
+    case 'info':
+      return 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950';
+    default:
+      return 'border-border bg-background';
+  }
+};
 
 export const useToast = () => {
   const context = useContext(ToastContext);
@@ -41,36 +71,6 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-
-  const getToastIcon = (type: ToastType) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className='w-5 h-5 text-green-500' />;
-      case 'error':
-        return <AlertTriangle className='w-5 h-5 text-red-500' />;
-      case 'warning':
-        return <AlertTriangle className='w-5 h-5 text-yellow-500' />;
-      case 'info':
-        return <Info className='w-5 h-5 text-blue-500' />;
-      default:
-        return null;
-    }
-  };
-
-  const getToastStyles = (type: ToastType) => {
-    switch (type) {
-      case 'success':
-        return 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950';
-      case 'error':
-        return 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950';
-      case 'warning':
-        return 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950';
-      case 'info':
-        return 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950';
-      default:
-        return 'border-border bg-background';
-    }
   };
 
   return (

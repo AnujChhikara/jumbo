@@ -2,15 +2,15 @@
 
 import { UsersApi } from '@/api/users/users.api';
 import { ActivityLog } from '@/components/activity-log';
-import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import { useToast } from '@/components/toast-provider';
-import { UserFormDialog } from '@/components/user-form-dialog';
-import { UserTable } from '@/components/user-table';
+import { UserFormDialog } from '@/modules/dashboard/user-form-dialog';
+import { UserTable } from '@/modules/dashboard/user-table';
 import { useActivityLogStore } from '@/stores/use-activity-log-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { User } from '../../api/users/users.types';
+import { DeleteConfirmationDialog } from './delete-confirmation-dialog';
 
 export const UserDashboard = () => {
   const queryClient = useQueryClient();

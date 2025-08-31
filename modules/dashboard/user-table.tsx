@@ -14,9 +14,9 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { User } from '../api/users/users.types';
+import { User } from '../../api/users/users.types';
 
-interface UserTableProps {
+type UserTableProps = {
   allUsers: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
@@ -29,7 +29,7 @@ interface UserTableProps {
   onSearchChange: (search: string) => void;
   onCompanyChange: (company: string) => void;
   onOpenActivityLog: () => void;
-}
+};
 
 export const UserTable = ({
   allUsers,

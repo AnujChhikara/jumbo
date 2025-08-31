@@ -1,16 +1,16 @@
 'use client';
 
+import { User } from '@/api/users/users.types';
 import * as Dialog from '@radix-ui/react-dialog';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
-import { User } from '../api/users/users.types';
 
-interface DeleteConfirmationDialogProps {
+type DeleteConfirmationDialogProps = {
   user: User | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   isDeleting?: boolean;
-}
+};
 
 export const DeleteConfirmationDialog = ({
   user,

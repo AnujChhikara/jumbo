@@ -1,20 +1,12 @@
 'use client';
 
+import { getInitials } from '../lib/utils';
 import { useSettingsStore } from '../stores/use-settings-store';
 
 export const UserAvatar = () => {
   const { loggedInUser } = useSettingsStore();
 
   const user = loggedInUser;
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   const initials = getInitials(user.name);
 
