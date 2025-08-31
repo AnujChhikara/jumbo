@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  History,
   Pencil,
   Plus,
   Search,
@@ -27,6 +28,7 @@ interface UserTableProps {
   selectedCompany: string;
   onSearchChange: (search: string) => void;
   onCompanyChange: (company: string) => void;
+  onOpenActivityLog: () => void;
 }
 
 export const UserTable = ({
@@ -41,6 +43,7 @@ export const UserTable = ({
   selectedCompany,
   onSearchChange,
   onCompanyChange,
+  onOpenActivityLog,
 }: UserTableProps) => {
   const router = useRouter();
   const [emailSortOrder, setEmailSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -157,6 +160,15 @@ export const UserTable = ({
         >
           <Plus className='w-4 h-4' />
           Add User
+        </button>
+
+        <button
+          onClick={onOpenActivityLog}
+          className='flex items-center text-sm gap-2 px-4 py-2 border border-border bg-background text-foreground rounded-md hover:bg-accent transition-colors min-h-[40px]'
+          title='View Activity Log'
+        >
+          <History className='w-4 h-4' />
+          Activity Log
         </button>
       </div>
 

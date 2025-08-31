@@ -1,10 +1,12 @@
 'use client';
 
 import { UsersApi } from '@/api/users/users.api';
+import { ActivityLog } from '@/components/activity-log';
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import { useToast } from '@/components/toast-provider';
 import { UserFormDialog } from '@/components/user-form-dialog';
 import { UserTable } from '@/components/user-table';
+import { useActivityLogStore } from '@/stores/use-activity-log-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -20,6 +22,8 @@ export const UserDashboard = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
+  const { addLog } = useActivityLogStore();
 
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const searchTerm = searchParams.get('search') || '';
@@ -103,6 +107,13 @@ export const UserDashboard = () => {
         return old;
       });
 
+      addLog({
+        action: 'deleted',
+        userId: deletedUser.id,
+        userName: deletedUser.name,
+        details: `Deleted user ${deletedUser.name} (${deletedUser.email})`,
+      });
+
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
       showToast('success', 'User deleted successfully');
@@ -134,6 +145,7 @@ export const UserDashboard = () => {
           selectedCompany={selectedCompany}
           onSearchChange={handleSearchChange}
           onCompanyChange={handleCompanyChange}
+          onOpenActivityLog={() => setIsActivityLogOpen(true)}
         />
       </div>
 
@@ -141,6 +153,7 @@ export const UserDashboard = () => {
         user={editingUser}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        onUserAction={addLog}
       />
       <DeleteConfirmationDialog
         user={userToDelete}
@@ -148,6 +161,10 @@ export const UserDashboard = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
+      />
+      <ActivityLog
+        isOpen={isActivityLogOpen}
+        onClose={() => setIsActivityLogOpen(false)}
       />
     </div>
   );

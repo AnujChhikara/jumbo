@@ -9,12 +9,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { UsersApi } from '../api/users/users.api';
 import { User } from '../api/users/users.types';
+import { ActivityLogEntry } from '../stores/use-activity-log-store';
 import { useToast } from './toast-provider';
 
 interface UserFormDialogProps {
   user?: User | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onUserAction?: (entry: Omit<ActivityLogEntry, 'id' | 'timestamp'>) => void;
 }
 
 const userFormSchema = z.object({
@@ -36,6 +38,7 @@ export const UserFormDialog = ({
   user,
   isOpen,
   onOpenChange,
+  onUserAction,
 }: UserFormDialogProps) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -107,6 +110,15 @@ export const UserFormDialog = ({
     },
     onSuccess: (data, formData) => {
       const userData = createUserData(formData);
+
+      if (onUserAction) {
+        onUserAction({
+          action: isEditing ? 'updated' : 'created',
+          userId: userData.id,
+          userName: userData.name,
+          details: `${isEditing ? 'Updated' : 'Created'} user ${userData.name} (${userData.email})`,
+        });
+      }
 
       queryClient.setQueriesData(
         { queryKey: ['users'] },
