@@ -7,7 +7,7 @@ export type TApiMethodsRecord = Record<
   string,
   {
     key: string[];
-    fn: () => Promise<any>;
+    fn: () => Promise<TApiResponse<unknown>>;
   }
 >;
 
