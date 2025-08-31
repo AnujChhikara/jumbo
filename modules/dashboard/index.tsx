@@ -69,29 +69,24 @@ export const UserDashboard = () => {
 
   return (
     <div className='min-w-7xl mx-auto flex'>
-      <div className=' flex flex-col  gap-4  '>
-        <h1 className='text-2xl font-bold text-foreground mb-2'>
-          User Dashboard
-        </h1>
-        <UserTable
-          users={users ?? []}
-          onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
-          onAddUser={handleAddUser}
-        />
-        <UserFormDialog
-          user={editingUser}
-          isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-        />
-        <DeleteConfirmationDialog
-          user={userToDelete}
-          isOpen={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
-          onConfirm={handleConfirmDelete}
-          isDeleting={isDeleting}
-        />
-      </div>
+      <UserTable
+        users={users ?? []}
+        onEdit={handleEditUser}
+        onDelete={handleDeleteUser}
+        onAddUser={handleAddUser}
+      />
+      <UserFormDialog
+        user={editingUser}
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
+      <DeleteConfirmationDialog
+        user={userToDelete}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { User } from '../api/users/users.types';
 
@@ -27,6 +28,7 @@ export const UserTable = ({
   onDelete,
   onAddUser,
 }: UserTableProps) => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [emailSortOrder, setEmailSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -192,7 +194,8 @@ export const UserTable = ({
               {paginatedUsers.map(user => (
                 <tr
                   key={user.id}
-                  className='hover:bg-muted/30 transition-colors'
+                  className='hover:bg-muted/30 transition-colors cursor-pointer'
+                  onClick={() => router.push(`/users/${user.id}`)}
                 >
                   <td className='px-4 py-3'>
                     <div className='flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium'>
@@ -214,14 +217,20 @@ export const UserTable = ({
                   <td className='px-4 py-3'>
                     <div className='flex items-center gap-2'>
                       <button
-                        onClick={() => onEdit(user)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          onEdit(user);
+                        }}
                         className='p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
                         title='Edit user'
                       >
                         <Pencil className='w-4 h-4' />
                       </button>
                       <button
-                        onClick={() => onDelete(user)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          onDelete(user);
+                        }}
                         className='p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-ring'
                         title='Delete user'
                       >
