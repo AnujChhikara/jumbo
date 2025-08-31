@@ -6,24 +6,50 @@ import { useToast } from '@/components/toast-provider';
 import { UserFormDialog } from '@/components/user-form-dialog';
 import { UserTable } from '@/components/user-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { User } from '../../api/users/users.types';
 
 export const UserDashboard = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const userSearchTerm = searchParams.get('username') || '';
+  const selectedCompany = searchParams.get('company') || 'all';
+  const usersPerPage = 8;
+
   const {
-    data: users,
+    data: paginatedData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => UsersApi.getUserData.fn(),
+    queryKey: ['users', 'paginated', currentPage, usersPerPage],
+    queryFn: () => UsersApi.getUsersPaginated.fn(currentPage, usersPerPage),
   });
+
+  const users = paginatedData?.users ?? [];
+  const totalPages = paginatedData?.totalPages ?? 0;
+  const allUsers = users;
+
+  const handlePageChange = (page: number) => {
+    router.push(`?page=${page}`);
+  };
+
+  const handleUserSearchChange = (term: string) => {
+    router.push(`?username=${term}&page=1`);
+  };
+
+  const handleCompanyChange = (company: string) => {
+    router.push(`?company=${company}&page=1`);
+  };
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
@@ -42,16 +68,25 @@ export const UserDashboard = () => {
 
   const { mutate: deleteUser, isPending: isDeleting } = useMutation({
     mutationFn: (user: User) => UsersApi.deleteUser.fn(user.id),
-    onMutate: async deletedUser => {
-      await queryClient.cancelQueries({ queryKey: ['users'] });
-      const previousUsers = queryClient.getQueryData(['users']);
-      queryClient.setQueryData(['users'], (old: User[] | undefined) => {
-        if (!old) return [];
-        return old.filter(user => user.id !== deletedUser.id);
+    onSuccess: (data, deletedUser) => {
+      queryClient.setQueriesData({ queryKey: ['users'] }, (old: any) => {
+        if (!old) return old;
+
+        if (old.users) {
+          const updatedUsers = old.users.filter(
+            (u: User) => u.id !== deletedUser.id
+          );
+          return {
+            ...old,
+            users: updatedUsers,
+            total: old.total - 1,
+            totalPages: Math.ceil((old.total - 1) / 8),
+          };
+        }
+
+        return old;
       });
-      return { previousUsers };
-    },
-    onSuccess: () => {
+
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
       showToast('success', 'User deleted successfully');
@@ -69,12 +104,24 @@ export const UserDashboard = () => {
 
   return (
     <div className='min-w-7xl mx-auto flex'>
-      <UserTable
-        users={users ?? []}
-        onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
-        onAddUser={handleAddUser}
-      />
+      <div className='min-w-7xl space-y-4'>
+        <h1 className='text-2xl font-bold'>User Dashboard</h1>
+        <UserTable
+          users={users ?? []}
+          allUsers={allUsers ?? []}
+          onEdit={handleEditUser}
+          onDelete={handleDeleteUser}
+          onAddUser={handleAddUser}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onSearchChange={handleUserSearchChange}
+          onCompanyChange={handleCompanyChange}
+          searchTerm={userSearchTerm}
+          selectedCompany={selectedCompany}
+        />
+      </div>
+
       <UserFormDialog
         user={editingUser}
         isOpen={isDialogOpen}

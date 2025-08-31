@@ -1,14 +1,32 @@
 import axios from 'axios';
-import { User, UsersResponse } from './users.types';
+import { User } from './users.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
 export const UsersApi = {
-  getUserData: {
-    key: ['usersApi', 'getUserData'] as const,
-    fn: async (): Promise<UsersResponse> => {
-      const response = await axios.get<User[]>(`${API_BASE_URL}/users`);
-      return response.data;
+  getUsersPaginated: {
+    key: (page: number, limit: number) =>
+      ['usersApi', 'getUsersPaginated', page, limit] as const,
+    fn: async (
+      page: number = 1,
+      limit: number = 8
+    ): Promise<{ users: User[]; total: number; totalPages: number }> => {
+      const params = new URLSearchParams({
+        _page: page.toString(),
+        _limit: limit.toString(),
+      });
+
+      const response = await axios.get<User[]>(
+        `${API_BASE_URL}/users?${params}`
+      );
+      const users = response.data;
+      const totalCount = parseInt(response.headers['x-total-count'] as string);
+
+      return {
+        users,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      };
     },
   },
 

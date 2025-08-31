@@ -26,6 +26,12 @@ const userFormSchema = z.object({
 
 type UserFormData = z.infer<typeof userFormSchema>;
 
+type PaginatedUsersData = {
+  users: User[];
+  total: number;
+  totalPages: number;
+};
+
 export const UserFormDialog = ({
   user,
   isOpen,
@@ -34,6 +40,27 @@ export const UserFormDialog = ({
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const isEditing = !!user;
+
+  const createUserData = (formData: UserFormData): User => ({
+    id: user?.id || Date.now(),
+    name: formData.name,
+    email: formData.email,
+    phone: formData.phone,
+    username: formData.name,
+    website: `${formData.name.toLowerCase().replace(/\s+/g, '')}.com`,
+    address: {
+      street: '123 Main St',
+      suite: 'Apt 1',
+      city: 'New York',
+      zipcode: '10001',
+      geo: { lat: '40.7128', lng: '-74.0060' },
+    },
+    company: {
+      name: formData.company,
+      catchPhrase: 'Innovation at its finest',
+      bs: 'synergize scalable supply-chains',
+    },
+  });
 
   const {
     control,
@@ -70,26 +97,7 @@ export const UserFormDialog = ({
 
   const { mutate: saveUser, isPending } = useMutation({
     mutationFn: async (formData: UserFormData) => {
-      const userData: User = {
-        id: user?.id || Date.now(),
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        username: formData.name.toLowerCase().replace(/\s+/g, ''),
-        website: `${formData.name.toLowerCase().replace(/\s+/g, '')}.com`,
-        address: {
-          street: '123 Main St',
-          suite: 'Apt 1',
-          city: 'New York',
-          zipcode: '10001',
-          geo: { lat: '40.7128', lng: '-74.0060' },
-        },
-        company: {
-          name: formData.company,
-          catchPhrase: 'Innovation at its finest',
-          bs: 'synergize scalable supply-chains',
-        },
-      };
+      const userData = createUserData(formData);
 
       if (isEditing) {
         return UsersApi.updateUser.fn(userData);
@@ -97,49 +105,34 @@ export const UserFormDialog = ({
         return UsersApi.createUser.fn(userData);
       }
     },
-    onMutate: async formData => {
-      await queryClient.cancelQueries({ queryKey: ['users'] });
-      const previousUsers = queryClient.getQueryData(['users']);
+    onSuccess: (data, formData) => {
+      const userData = createUserData(formData);
 
-      const newUser: User = {
-        id: user?.id || Date.now(),
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        username: formData.name.toLowerCase().replace(/\s+/g, ''),
-        website: `${formData.name.toLowerCase().replace(/\s+/g, '')}.com`,
-        address: {
-          street: '123 Main St',
-          suite: 'Apt 1',
-          city: 'New York',
-          zipcode: '10001',
-          geo: { lat: '40.7128', lng: '-74.0060' },
-        },
-        company: {
-          name: formData.company,
-          catchPhrase: 'Innovation at its finest',
-          bs: 'synergize scalable supply-chains',
-        },
-      };
+      queryClient.setQueriesData(
+        { queryKey: ['users'] },
+        (old: PaginatedUsersData | undefined) => {
+          if (!old) return old;
 
-      queryClient.setQueryData(['users'], (old: User[] | undefined) => {
-        if (!old) return [newUser];
-        if (isEditing) {
-          return old.map(u => (u.id === newUser.id ? newUser : u));
-        } else {
-          return [newUser, ...old];
+          if (old.users) {
+            if (isEditing) {
+              const updatedUsers = old.users.map((u: User) =>
+                u.id === userData.id ? userData : u
+              );
+              return { ...old, users: updatedUsers };
+            } else {
+              return {
+                ...old,
+                users: [userData, ...old.users],
+                total: old.total + 1,
+                totalPages: Math.ceil((old.total + 1) / 8),
+              };
+            }
+          }
+
+          return old;
         }
-      });
+      );
 
-      return { previousUsers };
-    },
-    onError: (err, formData, context) => {
-      if (context?.previousUsers) {
-        queryClient.setQueryData(['users'], context.previousUsers);
-      }
-      showToast('error', 'Failed to save user');
-    },
-    onSuccess: () => {
       onOpenChange(false);
       reset();
       showToast(

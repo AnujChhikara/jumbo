@@ -17,51 +17,52 @@ import { User } from '../api/users/users.types';
 
 interface UserTableProps {
   users: User[];
+  allUsers: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onAddUser: () => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onSearchChange: (term: string) => void;
+  onCompanyChange: (company: string) => void;
+  searchTerm: string;
+  selectedCompany: string;
 }
 
 export const UserTable = ({
   users,
+  allUsers,
   onEdit,
   onDelete,
   onAddUser,
+  currentPage,
+  totalPages,
+  onPageChange,
+  onSearchChange,
+  onCompanyChange,
+  searchTerm,
+  selectedCompany,
 }: UserTableProps) => {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [emailSortOrder, setEmailSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 8;
 
   const companies = useMemo(() => {
-    const uniqueCompanies = [...new Set(users.map(user => user.company.name))];
-    return uniqueCompanies.sort();
-  }, [users]);
-
-  const filteredUsers = useMemo(() => {
-    return users.filter(user => {
-      const matchesSearch = user.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesCompany =
-        selectedCompany === 'all' || user.company.name === selectedCompany;
-      return matchesSearch && matchesCompany;
-    });
-  }, [users, searchTerm, selectedCompany]);
+    const uniqueCompanies = [
+      ...new Set(allUsers.map(user => user.company.name)),
+    ];
+    return uniqueCompanies.sort((a, b) => a.localeCompare(b));
+  }, [allUsers]);
 
   const sortedUsers = useMemo(() => {
-    return [...filteredUsers].sort((a, b) => {
-      const comparison = a.email.localeCompare(b.email);
-      return emailSortOrder === 'asc' ? comparison : -comparison;
+    return [...users].sort((a, b) => {
+      const emailA = a.email.toLowerCase();
+      const emailB = b.email.toLowerCase();
+      return emailSortOrder === 'asc'
+        ? emailA.localeCompare(emailB)
+        : emailB.localeCompare(emailA);
     });
-  }, [filteredUsers, emailSortOrder]);
-
-  const totalPages = Math.ceil(sortedUsers.length / usersPerPage);
-  const startIndex = (currentPage - 1) * usersPerPage;
-  const endIndex = startIndex + usersPerPage;
-  const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
+  }, [users, emailSortOrder]);
 
   const getInitials = (name: string) => {
     return name
@@ -77,21 +78,15 @@ export const UserTable = ({
   };
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  };
-
-  const resetPagination = () => {
-    setCurrentPage(1);
+    onPageChange(Math.max(1, Math.min(page, totalPages)));
   };
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    resetPagination();
+    onSearchChange(value);
   };
 
   const handleCompanyChange = (value: string) => {
-    setSelectedCompany(value);
-    resetPagination();
+    onCompanyChange(value);
   };
 
   return (
@@ -191,7 +186,7 @@ export const UserTable = ({
               </tr>
             </thead>
             <tbody className='divide-y divide-border'>
-              {paginatedUsers.map(user => (
+              {sortedUsers.map((user: User) => (
                 <tr
                   key={user.id}
                   className='hover:bg-muted/30 transition-colors cursor-pointer'
@@ -244,7 +239,7 @@ export const UserTable = ({
           </table>
         </div>
 
-        {paginatedUsers.length === 0 && (
+        {users.length === 0 && (
           <div className='px-4 py-8 text-center text-muted-foreground'>
             {searchTerm || selectedCompany !== 'all'
               ? 'No users match your filters.'
